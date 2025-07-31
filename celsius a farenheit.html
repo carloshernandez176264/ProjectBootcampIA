@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Temperaturas</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.92);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .converter-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #convertBtn {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+        }
+        
+        #resetBtn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            background: linear-gradient(to right, #2c3e50, #4a6491);
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        #result {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .explanation {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .history {
+            margin-top: 25px;
+            text-align: left;
+        }
+        
+        .history h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        #historyList {
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+        }
+        
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .error {
+            color: #e74c3c;
+            background-color: #fdecea;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .footer {
+            margin-top: 25px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Conversor de Temperaturas</h1>
+            <p>Convierte fácilmente entre Celsius y Fahrenheit</p>
+        </div>
+        
+        <div class="converter-box">
+            <div class="input-group">
+                <label for="temperature">Temperatura:</label>
+                <input type="number" id="temperature" placeholder="Ingrese la temperatura" step="any">
+            </div>
+            
+            <div class="input-group">
+                <label for="conversionType">Tipo de conversión:</label>
+                <select id="conversionType">
+                    <option value="celsiusToFahrenheit">Celsius a Fahrenheit</option>
+                    <option value="fahrenheitToCelsius">Fahrenheit a Celsius</option>
+                </select>
+            </div>
+            
+            <div class="error" id="errorMsg"></div>
+            
+            <div class="btn-group">
+                <button id="convertBtn">Convertir</button>
+                <button id="resetBtn">Limpiar</button>
+            </div>
+        </div>
+        
+        <div class="result-container">
+            <div>Resultado:</div>
+            <div id="result">-</div>
+            <div class="explanation" id="explanation"></div>
+        </div>
+        
+        <div class="history">
+            <h3>Historial de Conversiones</h3>
+            <div id="historyList">
+                <!-- Las conversiones se añadirán aquí dinámicamente -->
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Conversor desarrollado con JavaScript - Funciones basadas en el código Python original</p>
+        </div>
+    </div>
+    
+    <script>
+        // Funciones equivalentes a las de Python
+        function celsius_a_fahrenheit(celsius) {
+            return (celsius * 9/5) + 32;
+        }
+        
+        function fahrenheit_a_celsius(fahrenheit) {
+            return (fahrenheit - 32) * 5/9;
+        }
+        
+        // Elementos DOM
+        const temperatureInput = document.getElementById('temperature');
+        const conversionTypeSelect = document.getElementById('conversionType');
+        const convertBtn = document.getElementById('convertBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultDiv = document.getElementById('result');
+        const explanationDiv = document.getElementById('explanation');
+        const errorMsgDiv = document.getElementById('errorMsg');
+        const historyList = document.getElementById('historyList');
+        
+        // Historial de conversiones
+        let conversionHistory = [];
+        
+        // Convertir temperatura
+        function convertTemperature() {
+            const inputValue = temperatureInput.value.trim();
+            
+            // Validar entrada
+            if (inputValue === '') {
+                showError('Por favor, ingrese una temperatura');
+                return;
+            }
+            
+            const temperature = parseFloat(inputValue);
+            
+            if (isNaN(temperature)) {
+                showError('Por favor, ingrese un número válido');
+                return;
+            }
+            
+            // Ocultar mensajes de error
+            hideError();
+            
+            const conversionType = conversionTypeSelect.value;
+            let result, fromUnit, toUnit, formula;
+            
+            // Realizar conversión
+            if (conversionType === 'celsiusToFahrenheit') {
+                result = celsius_a_fahrenheit(temperature);
+                fromUnit = '°C';
+                toUnit = '°F';
+                formula = `Fórmula: (${temperature} × 9/5) + 32 = ${result.toFixed(2)}`;
+            } else {
+                result = fahrenheit_a_celsius(temperature);
+                fromUnit = '°F';
+                toUnit = '°C';
+                formula = `Fórmula: (${temperature} - 32) × 5/9 = ${result.toFixed(2)}`;
+            }
+            
+            // Mostrar resultado
+            resultDiv.textContent = `${result.toFixed(2)} ${toUnit}`;
+            explanationDiv.textContent = formula;
+            
+            // Guardar en historial
+            const historyEntry = {
+                from: `${temperature} ${fromUnit}`,
+                to: `${result.toFixed(2)} ${toUnit}`,
+                conversion: conversionType
+            };
+            
+            conversionHistory.unshift(historyEntry);
+            if (conversionHistory.length > 5) {
+                conversionHistory.pop();
+            }
+            
+            updateHistory();
+        }
+        
+        // Actualizar historial
+        function updateHistory() {
+            historyList.innerHTML = '';
+            
+            conversionHistory.forEach(entry => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                let conversionText;
+                if (entry.conversion === 'celsiusToFahrenheit') {
+                    conversionText = 'Celsius → Fahrenheit';
+                } else {
+                    conversionText = 'Fahrenheit → Celsius';
+                }
+                
+                historyItem.innerHTML = `
+                    <strong>${entry.from}</strong> → <strong>${entry.to}</strong>
+                    <div style="font-size: 0.8em; color: #7f8c8d;">${conversionText}</div>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        // Mostrar error
+        function showError(message) {
+            errorMsgDiv.textContent = message;
+            errorMsgDiv.style.display = 'block';
+            resultDiv.textContent = '-';
+            explanationDiv.textContent = '';
+        }
+        
+        // Ocultar error
+        function hideError() {
+            errorMsgDiv.style.display = 'none';
+        }
+        
+        // Limpiar campos
+        function resetConverter() {
+            temperatureInput.value = '';
+            resultDiv.textContent = '-';
+            explanationDiv.textContent = '';
+            hideError();
+            temperatureInput.focus();
+        }
+        
+        // Event listeners
+        convertBtn.addEventListener('click', convertTemperature);
+        resetBtn.addEventListener('click', resetConverter);
+        
+        // Permitir Enter para convertir
+        temperatureInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                convertTemperature();
+            }
+        });
+        
+        // Inicializar historial
+        updateHistory();
+    </script>
+</body>
+</html>
